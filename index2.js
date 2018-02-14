@@ -1,17 +1,83 @@
 function Ray(origin, angle) {
     this.origin = origin
     this.angle = angle
-    this.maxDist = 100
+    this.maxDist = 500
 }
 
 Ray.prototype.cast = function (collisionFunc) {
-    for (let distance = 0; distance <= 500; distance += 0.01) {
+    for (let distance = 0; distance <= this.maxDist; distance += 0.01) {
         const rayX = this.origin.x + distance * Math.cos(Math.PI / 180 * this.angle)
         const rayY = this.origin.y + distance * Math.sin(Math.PI / 180 * this.angle)
 
-        if (collisionFunc(rayX, rayY)) {
-            return distance
+        let collisionResult = collisionFunc(rayX, rayY, distance)
+        if (collisionResult.hit === true) {
+            return collisionResult
         }
     }
-    return 0
+    return null
+}
+
+function RayCaster(fov, focalLength, columnWidth, screenWidth) {
+    this.fov = fov
+    this.focalLength = focalLength
+    this.columnWidth = columnWidth
+    this.screenWidth = screenWidth
+}
+
+/**
+ * Cast out a series of rays in a cone starting from origin at an angle this.fov / 2 either
+ * side of the absolute angle facing, returning an array containing collision data for each ray
+ * @param  {Object} origin          x and y coords to project from
+ * @param  {number} facing          angle to project towards
+ * @param  {function} collisionFunc returns collision data for x and y coords
+ * @return {Array}                  contains collision data for each ray
+ */
+RayCaster.prototype.cast = function (origin, facing, collisionFunc) {
+    const angleStep = this.columnWidth * this.fov / this.screenWidth
+
+    let zArray = []
+
+    for (let i = 0; i < this.screenWidth / this.columnWidth; ++i) {
+        const angle = facing - this.fov / 2 + angleStep * i
+        const perspectiveAngle = Math.atan2(
+            this.columnWidth * i / this.screenWidth - 0.5,
+            this.focalLength
+        )
+
+        zArray[i] = new Ray(origin, angle).cast(collisionFunc(perspectiveAngle))
+    }
+
+    return zArray
+}
+
+function World() {
+}
+
+function GridWorld() {
+    this.grid = [[]]
+}
+
+GridWorld.prototype = World
+
+GridWorld.prototype.collisionFunc = function(perspectiveAngle) {
+    return function (x, y, distance) {
+        const squareType = this.grid[Math.floor(y)][Math.floor(x)]
+        if (squareType != 0) {
+            return {
+                z: distance * Math.cos(perspectiveAngle),
+                type: squareType
+            }
+        }
+        return null
+    }
+}
+
+
+function Renderer(canvas, rayCaster) {
+    this.canvas = canvas
+    this.rayCaster = rayCaster
+}
+
+Renderer.prototype.render(origin, facing, world) {
+    this.rayCaster.cast(origin, facing, world.collisionFunc)
 }
