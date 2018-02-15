@@ -59,7 +59,7 @@ function GridWorld() {
 
 GridWorld.prototype = World
 
-GridWorld.prototype.collisionFunc = function(perspectiveAngle) {
+GridWorld.prototype.collisionFunc = function (perspectiveAngle) {
     return function (x, y, distance) {
         const squareType = this.grid[Math.floor(y)][Math.floor(x)]
         if (squareType != 0) {
@@ -72,12 +72,53 @@ GridWorld.prototype.collisionFunc = function(perspectiveAngle) {
     }
 }
 
+GridWorld.prototype.render = function (ctx) {
+    var imageData = ctx.createImageData(width, height)
+    var data = imageData.data
 
-function Renderer(canvas, rayCaster) {
-    this.canvas = canvas
+    for (let x = 0; x < width; ++x) {
+        const columnIndex = Math.floor(x / columnWidth)
+        const wallHeight = height / zArray[columnIndex].z
+        const shadingFactor = Math.min(1, 1.4/zArray[columnIndex].z + 0.3)
+
+        for (let y = 0; y < height; ++y) {
+            if (
+                y < (height - wallHeight) / 2 ||
+                y > (height + wallHeight) / 2
+            ) {
+                data[y * width * 4 + (x * 4) + 0] = 200
+                data[y * width * 4 + (x * 4) + 1] = 200
+                data[y * width * 4 + (x * 4) + 2] = 200
+            } else {
+                if (zArray[columnIndex].type == 1) {
+                    data[y * width * 4 + (x * 4) + 0] = 0
+                    data[y * width * 4 + (x * 4) + 1] = 150 * shadingFactor
+                    data[y * width * 4 + (x * 4) + 2] = 0
+                }
+                else if (zArray[columnIndex].type == 2) {
+                    data[y * width * 4 + (x * 4) + 0] = 150 * shadingFactor
+                    data[y * width * 4 + (x * 4) + 1] = 0
+                    data[y * width * 4 + (x * 4) + 2] = 0
+                }
+            }
+            data[y * width * 4 + (x * 4) + 3] = 255
+        }
+    }
+
+    ctx.putImageData(imageData, 0, 0)
+}
+
+function Renderer(ctx, rayCaster) {
+    this.ctx = ctx
     this.rayCaster = rayCaster
 }
 
 Renderer.prototype.render(origin, facing, world) {
     this.rayCaster.cast(origin, facing, world.collisionFunc)
+}
+
+function Player(x, y, facing) {
+    this.x = x
+    this.y = y
+    this.facing = facing
 }
