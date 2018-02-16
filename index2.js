@@ -123,25 +123,23 @@ function Player(position, facing) {
     this.facing = facing
 }
 
-function Texture(path, onLoad) {
-    if (path !== undefined && onLoad !== undefined) {
-        this.load(path, onLoad)
-    }
+function Texture() {
 }
 
-Texture.prototype.load = function (path, onLoad) {
+Texture.prototype.load = function (path) {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
 
     this.image = new Image()
     this.image.src = path
-    this.image.onload = () => {
-        ctx.drawImage(this.image, 0, 0)
-        this.imageData = ctx.getImageData(0, 0, this.image.width, this.image.height)
-        onLoad(this)
-    }
 
-    return this
+    return new Promise((resolve, reject) => {
+        this.image.onload = () => {
+            ctx.drawImage(this.image, 0, 0)
+            this.imageData = ctx.getImageData(0, 0, this.image.width, this.image.height)
+            resolve(this)
+        }
+    })
 }
 
 function App() {
@@ -179,8 +177,9 @@ function App() {
 }
 
 App.prototype.run = function () {
-    new Texture('wallpaper.png', (texture) => {
+    new Texture().load('wallpaper.png').then((texture) => {
         this.wallTexture = texture
+    }).then(() => {
         window.requestAnimationFrame(this.loop.bind(this))
     })
 }
