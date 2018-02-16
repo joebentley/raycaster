@@ -159,12 +159,12 @@ Texture.prototype.getTexPixel = function (x, y) {
         const xImage = x % this.image.width
         const yImage = y % this.image.height
         const coord = yImage * this.image.width * 4 + (xImage * 4)
-        console.log(this.imageData[coord])
+        console.log(this.imageData.data[coord])
         return {
-            r: this.imageData[coord + 0],
-            g: this.imageData[coord + 1],
-            b: this.imageData[coord + 2],
-            a: this.imageData[coord + 3]
+            r: this.imageData.data[coord + 0],
+            g: this.imageData.data[coord + 1],
+            b: this.imageData.data[coord + 2],
+            a: this.imageData.data[coord + 3]
         }
     }
     return null
