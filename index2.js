@@ -55,6 +55,7 @@ RayCaster.prototype.cast = function (origin, facing, collisionFunc) {
 function GridWorld(grid, player) {
     this.grid = grid
     this.player = player
+    this.textures = {}
 }
 
 GridWorld.prototype.collisionFunc = function (perspectiveAngle) {
@@ -83,30 +84,39 @@ GridWorld.prototype.render = function (width, height, ctx, rayCaster) {
         const shadingFactor = Math.min(1, 1.4/zArray[columnIndex].z + 0.3)
 
         for (let y = 0; y < height; ++y) {
+            const coord = y * width * 4 + (x * 4)
             if (
                 y < (height - wallHeight) / 2 ||
                 y > (height + wallHeight) / 2
             ) {
-                data[y * width * 4 + (x * 4) + 0] = 200
-                data[y * width * 4 + (x * 4) + 1] = 200
-                data[y * width * 4 + (x * 4) + 2] = 200
+                data[coord + 0] = 200
+                data[coord + 1] = 200
+                data[coord + 2] = 200
             } else {
                 if (zArray[columnIndex].type == 1) {
-                    data[y * width * 4 + (x * 4) + 0] = 0
-                    data[y * width * 4 + (x * 4) + 1] = 150 * shadingFactor
-                    data[y * width * 4 + (x * 4) + 2] = 0
+                    const texPixel = this.textures[1].getTexPixel(x, y)
+                    data[coord + 0] = texPixel.r
+                    data[coord + 1] = texPixel.g
+                    data[coord + 2] = texPixel.b
+                    // data[coord + 0] = 0
+                    // data[coord + 1] = 150 * shadingFactor
+                    // data[coord + 2] = 0
                 }
                 else if (zArray[columnIndex].type == 2) {
-                    data[y * width * 4 + (x * 4) + 0] = 150 * shadingFactor
-                    data[y * width * 4 + (x * 4) + 1] = 0
-                    data[y * width * 4 + (x * 4) + 2] = 0
+                    data[coord + 0] = 150 * shadingFactor
+                    data[coord + 1] = 0
+                    data[coord + 2] = 0
                 }
             }
-            data[y * width * 4 + (x * 4) + 3] = 255
+            data[coord + 3] = 255
         }
     }
 
     ctx.putImageData(imageData, 0, 0)
+}
+
+GridWorld.prototype.registerTexture = function (wallIndex, texture) {
+    this.textures[wallIndex] = texture
 }
 
 // function Renderer(ctx, rayCaster) {
@@ -124,6 +134,7 @@ function Player(position, facing) {
 }
 
 function Texture() {
+    this.loaded = false
 }
 
 Texture.prototype.load = function (path) {
@@ -137,9 +148,26 @@ Texture.prototype.load = function (path) {
         this.image.onload = () => {
             ctx.drawImage(this.image, 0, 0)
             this.imageData = ctx.getImageData(0, 0, this.image.width, this.image.height)
+            this.loaded = true
             resolve(this)
         }
     })
+}
+
+Texture.prototype.getTexPixel = function (x, y) {
+    if (this.loaded) {
+        const xImage = x % this.image.width
+        const yImage = y % this.image.height
+        const coord = yImage * this.image.width * 4 + (xImage * 4)
+        console.log(this.imageData[coord])
+        return {
+            r: this.imageData[coord + 0],
+            g: this.imageData[coord + 1],
+            b: this.imageData[coord + 2],
+            a: this.imageData[coord + 3]
+        }
+    }
+    return null
 }
 
 function App() {
@@ -147,13 +175,13 @@ function App() {
     this.ctx = this.canvas.getContext('2d')
     this.width = this.canvas.width
     this.height = this.canvas.height
-    this.rayCaster = new RayCaster(60, 1, 1, this.width)
+    this.rayCaster = new RayCaster(60, 1, 20, this.width)
 
     const roomData = [
         [1,1,1,1,1,1,1,1],
         [1,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,2],
         [1,0,0,2,0,0,0,1],
         [1,0,0,2,0,0,0,1],
         [1,0,0,2,0,0,0,1],
@@ -178,7 +206,7 @@ function App() {
 
 App.prototype.run = function () {
     new Texture().load('wallpaper.png').then((texture) => {
-        this.wallTexture = texture
+        this.gridWorld.registerTexture(1, texture)
     }).then(() => {
         window.requestAnimationFrame(this.loop.bind(this))
     })
@@ -219,7 +247,7 @@ App.prototype.loop = function () {
     }
 
     this.gridWorld.render(this.width, this.height, this.ctx, this.rayCaster)
-    window.requestAnimationFrame(this.loop.bind(this))
+    // window.requestAnimationFrame(this.loop.bind(this))
 }
 
 new App().run()
