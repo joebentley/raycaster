@@ -123,6 +123,27 @@ function Player(position, facing) {
     this.facing = facing
 }
 
+function Texture(path, onLoad) {
+    if (path !== undefined && onLoad !== undefined) {
+        this.load(path, onLoad)
+    }
+}
+
+Texture.prototype.load = function (path, onLoad) {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+
+    this.image = new Image()
+    this.image.src = path
+    this.image.onload = () => {
+        ctx.drawImage(this.image, 0, 0)
+        this.imageData = ctx.getImageData(0, 0, this.image.width, this.image.height)
+        onLoad(this)
+    }
+
+    return this
+}
+
 function App() {
     this.canvas = document.getElementById('canvas')
     this.ctx = this.canvas.getContext('2d')
@@ -158,7 +179,10 @@ function App() {
 }
 
 App.prototype.run = function () {
-    window.requestAnimationFrame(this.loop.bind(this))
+    new Texture('wallpaper.png', (texture) => {
+        this.wallTexture = texture
+        window.requestAnimationFrame(this.loop.bind(this))
+    })
 }
 
 App.prototype.loop = function () {
