@@ -82,7 +82,10 @@ class GridWorld {
         }
     }
 
-    render (width, height, ctx, rayCaster): void {
+    render (
+        width: number, height: number,
+        ctx: CanvasRenderingContext2D, rayCaster: RayCaster
+    ): void {
         let imageData: ImageData = ctx.createImageData(width, height)
         let data: Uint8ClampedArray = imageData.data
 
@@ -132,7 +135,7 @@ class GridWorld {
         ctx.putImageData(imageData, 0, 0)
     }
 
-    registerTexture (wallIndex, texture) {
+    registerTexture (wallIndex: number, texture: Texture) {
         this.textures[wallIndex] = texture
     }
 }
