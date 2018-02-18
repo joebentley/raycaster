@@ -93,20 +93,26 @@ GridWorld.prototype.render = function (width, height, ctx, rayCaster) {
                 data[coord + 1] = 200
                 data[coord + 2] = 200
             } else {
-                if (zArray[columnIndex].type == 1) {
-                    const texPixel = this.textures[1].getTexPixel(x, y)
+                const wallType = zArray[columnIndex].type;
+                if (wallType in this.textures) {
+                    const texture = this.textures[wallType]
+                    // Perspective transformation of walls
+                    const texPixel = texture.interpTexPixel(
+                        x / width * zArray[columnIndex].z,
+                        (y - (height - wallHeight) / 2) / wallHeight
+                    )
+                    // const texPixel = this.textures[1].getTexPixel(x, y)
                     data[coord + 0] = texPixel.r
                     data[coord + 1] = texPixel.g
                     data[coord + 2] = texPixel.b
+
                     // data[coord + 0] = 0
                     // data[coord + 1] = 150 * shadingFactor
                     // data[coord + 2] = 0
                 }
-                else if (zArray[columnIndex].type == 2) {
-                    data[coord + 0] = 150 * shadingFactor
-                    data[coord + 1] = 0
-                    data[coord + 2] = 0
-                }
+                data[coord + 0] *= shadingFactor
+                data[coord + 1] *= shadingFactor
+                data[coord + 2] *= shadingFactor
             }
             data[coord + 3] = 255
         }
@@ -154,12 +160,28 @@ Texture.prototype.load = function (path) {
     })
 }
 
+Texture.prototype.interpTexPixel = function (x, y) {
+    if (this.loaded) {
+        const xImage = Math.round((x % 1) * this.image.width)
+        const yImage = Math.round((y % 1) * (this.image.height / 2)) // HACK
+        const coord = yImage * this.image.width * 4 + (xImage * 4)
+
+        return {
+            r: this.imageData.data[coord + 0],
+            g: this.imageData.data[coord + 1],
+            b: this.imageData.data[coord + 2],
+            a: this.imageData.data[coord + 3]
+        }
+    }
+    return null
+}
+
 Texture.prototype.getTexPixel = function (x, y) {
     if (this.loaded) {
         const xImage = x % this.image.width
-        const yImage = y % this.image.height
+        const yImage = y % (this.image.height / 2) // HACK
         const coord = yImage * this.image.width * 4 + (xImage * 4)
-        console.log(this.imageData.data[coord])
+
         return {
             r: this.imageData.data[coord + 0],
             g: this.imageData.data[coord + 1],
@@ -175,17 +197,17 @@ function App() {
     this.ctx = this.canvas.getContext('2d')
     this.width = this.canvas.width
     this.height = this.canvas.height
-    this.rayCaster = new RayCaster(60, 1, 20, this.width)
+    this.rayCaster = new RayCaster(60, 1, 1, this.width)
 
     const roomData = [
         [1,1,1,1,1,1,1,1],
         [1,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,2],
-        [1,0,0,2,0,0,0,1],
-        [1,0,0,2,0,0,0,1],
-        [1,0,0,2,0,0,0,1],
-        [1,0,0,2,0,0,0,1],
+        [1,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,1],
         [1,1,1,1,1,1,0,1],
         [1,0,0,0,0,0,0,1],
         [1,1,1,1,1,1,1,1]
@@ -207,6 +229,9 @@ function App() {
 App.prototype.run = function () {
     new Texture().load('wallpaper.png').then((texture) => {
         this.gridWorld.registerTexture(1, texture)
+        return new Texture().load('grass.jpg')
+    }).then((texture) => {
+        this.gridWorld.registerTexture(2, texture)
     }).then(() => {
         window.requestAnimationFrame(this.loop.bind(this))
     })
@@ -247,7 +272,7 @@ App.prototype.loop = function () {
     }
 
     this.gridWorld.render(this.width, this.height, this.ctx, this.rayCaster)
-    // window.requestAnimationFrame(this.loop.bind(this))
+    window.requestAnimationFrame(this.loop.bind(this))
 }
 
 new App().run()
