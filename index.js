@@ -109,6 +109,25 @@ class Player {
         this.facing = facing;
     }
 }
+class RGBA {
+    constructor(r, g, b, a) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
+    }
+}
+class SolidColour {
+    constructor(colour) {
+        this.colour = colour;
+    }
+    interpTexPixel(x, y) {
+        return this.colour;
+    }
+    getTexPixel(x, y) {
+        return this.colour;
+    }
+}
 class Texture {
     constructor() {
         this.loaded = false;
@@ -164,10 +183,10 @@ class App {
         this.height = this.canvas.height;
         this.rayCaster = new RayCaster(60, 1, 1, this.width);
         const roomData = [
-            [1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 2, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 2],
+            [1, 0, 0, 0, 0, 0, 0, 3],
             [1, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
@@ -193,6 +212,7 @@ class App {
         }).then((texture) => {
             this.gridWorld.registerTexture(2, texture);
         }).then(() => {
+            this.gridWorld.registerTexture(3, new SolidColour(new RGBA(255, 0, 0, 0)));
             window.requestAnimationFrame(this.loop.bind(this));
         });
     }

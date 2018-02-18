@@ -64,7 +64,7 @@ type CollisionFunc = (perspectiveAngle: number) => CollisionFuncTwo
 type CollisionFuncTwo = (x: number, y: number, distance: number) => CollisionResult
 
 class GridWorld {
-    textures: {[key: number]: Texture}
+    textures: {[key: number]: Drawable}
     constructor(public grid: Grid, public player: Player) {
         this.textures = {}
     }
@@ -135,7 +135,7 @@ class GridWorld {
         ctx.putImageData(imageData, 0, 0)
     }
 
-    registerTexture (wallIndex: number, texture: Texture) {
+    registerTexture (wallIndex: number, texture: Drawable) {
         this.textures[wallIndex] = texture
     }
 }
@@ -158,14 +158,31 @@ class Player {
     constructor(public position: Point, public facing: number) {}
 }
 
-interface RGBA {
-    r: number,
-    g: number,
-    b: number,
-    a: number
+class RGBA {
+    constructor(public r: number, public g: number, public b: number, public a: number) { }
 }
 
-class Texture {
+/**
+ * Contains image data
+ */
+interface Drawable {
+    interpTexPixel (x: number, y: number): RGBA,
+    getTexPixel (x: number, y: number): RGBA
+}
+
+class SolidColour implements Drawable {
+    constructor(public colour: RGBA) { }
+
+    interpTexPixel (x: number, y: number): RGBA {
+        return this.colour
+    }
+
+    getTexPixel (x: number, y: number): RGBA {
+        return this.colour
+    }
+}
+
+class Texture implements Drawable {
     loaded: boolean
     image: HTMLImageElement
     imageData: ImageData
@@ -241,10 +258,10 @@ class App {
         this.rayCaster = new RayCaster(60, 1, 1, this.width)
 
         const roomData = [
-            [1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,2,1],
             [1,0,0,0,0,0,0,1],
             [1,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,2],
+            [1,0,0,0,0,0,0,3],
             [1,0,0,0,0,0,0,1],
             [1,0,0,0,0,0,0,1],
             [1,0,0,0,0,0,0,1],
@@ -274,6 +291,7 @@ class App {
         }).then((texture) => {
             this.gridWorld.registerTexture(2, texture)
         }).then(() => {
+            this.gridWorld.registerTexture(3, new SolidColour(new RGBA(255, 0, 0, 0)))
             window.requestAnimationFrame(this.loop.bind(this))
         })
     }
