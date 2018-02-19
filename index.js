@@ -26,10 +26,10 @@ class RayCaster {
     /**
      * Cast out a series of rays in a cone starting from origin at an angle this.fov / 2 either
      * side of the absolute angle facing, returning an array containing collision data for each ray
-     * @param  {Point} origin           x and y coords to project from
-     * @param  {number} facing          angle to project towards
-     * @param  {function} collisionFunc returns collision data for x and y coords
-     * @return {Array}                  contains collision data for each ray
+     * @param  {Point} origin                x and y coords to project from
+     * @param  {number} facing               angle to project towards
+     * @param  {CollisionFunc} collisionFunc returns collision data for x and y coords
+     * @return {CollisionResult[]}           contains collision data for each ray
      */
     cast(origin, facing, collisionFunc) {
         const angleStep = this.columnWidth * this.fov / this.screenWidth;
