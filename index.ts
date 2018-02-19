@@ -140,15 +140,6 @@ class GridWorld {
     }
 }
 
-// function Renderer(ctx, rayCaster) {
-//     this.ctx = ctx
-//     this.rayCaster = rayCaster
-// }
-//
-// Renderer.prototype.render(origin, facing, world) {
-//     this.rayCaster.cast(origin, facing, world.collisionFunc)
-// }
-
 interface Point {
     x: number,
     y: number
