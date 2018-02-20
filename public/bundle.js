@@ -229,6 +229,8 @@ function () {
           _this2.loaded = true;
           resolve(_this2);
         };
+
+        _this2.image.onerror = reject;
       });
     }
   }, {
@@ -313,6 +315,8 @@ function () {
         _this4.gridWorld.registerTexture(2, texture);
       }).then(function () {
         _this4.gridWorld.registerTexture(3, new SolidColour(new RGBA(255, 0, 0, 0)));
+      }).finally(function () {
+        debugger; // Start the app
 
         window.requestAnimationFrame(_this4.loop.bind(_this4));
       });

@@ -125,6 +125,8 @@ class Texture {
         this.loaded = true;
         resolve(this);
       };
+
+      this.image.onerror = reject;
     });
   }
 
@@ -207,6 +209,9 @@ class App {
       this.gridWorld.registerTexture(2, texture);
     }).then(() => {
       this.gridWorld.registerTexture(3, new SolidColour(new RGBA(255, 0, 0, 0)));
+    }).finally(() => {
+      debugger;
+      // Start the app
       window.requestAnimationFrame(this.loop.bind(this));
     });
   }
