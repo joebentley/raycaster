@@ -6,9 +6,10 @@ import ReactDOM from 'react-dom';
 const app = new App();
 
 app.on('load', function () {
-  const width = app.gridWorld.width;
-  const height = app.gridWorld.height;
-  ReactDOM.render(<Editor width={width} height={height} />, document.getElementById('root'));
+  ReactDOM.render(
+    <Editor width={app.gridWorld.width} height={app.gridWorld.height} />,
+    document.getElementById('root')
+  );
 });
 
 app.run();
