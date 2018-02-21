@@ -8,6 +8,14 @@ class GridWorld {
     this.textures = {};
   }
 
+  get width() {
+    return this.grid[0].length;
+  }
+
+  get height() {
+    return this.grid.length;
+  }
+
   collisionFunc(perspectiveAngle) {
     return (x, y, distance) => {
       const squareType = this.grid[Math.floor(y)][Math.floor(x)];
@@ -171,6 +179,7 @@ export default class App {
     this.width = this.canvas.width;
     this.height = this.canvas.height;
     this.rayCaster = new RayCaster(60, 1, 1, this.width);
+    this.events = {};
 
     const roomData = [
       [1, 1, 1, 1, 1, 1, 2, 1],
@@ -202,6 +211,16 @@ export default class App {
     });
   }
 
+  on(event, callback) {
+    this.events[event] = callback;
+  }
+
+  emit(event) {
+    if (event in this.events) {
+      this.events[event]();
+    }
+  }
+
   run() {
     new Texture().load('wallpaper.png').then((texture) => {
       this.gridWorld.registerTexture(1, texture);
@@ -212,6 +231,7 @@ export default class App {
       this.gridWorld.registerTexture(3, new SolidColour(new RGBA(255, 0, 0, 0)));
     }).finally(() => {
       // Start the app
+      this.emit('load');
       window.requestAnimationFrame(this.loop.bind(this));
     });
   }

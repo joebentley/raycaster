@@ -1,13 +1,14 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
 import App from './app.js';
+import Editor from './editor.jsx'; // eslint-disable-line
+import React from 'react'; // eslint-disable-line
+import ReactDOM from 'react-dom';
 
-new App().run();
+const app = new App();
 
-class Game extends React.Component { // eslint-disable-line
-  render () {
-    return <h1>Hello</h1>;
-  }
-}
+app.on('load', function () {
+  const width = app.gridWorld.width;
+  const height = app.gridWorld.height;
+  ReactDOM.render(<Editor width={width} height={height} />, document.getElementById('root'));
+});
 
-ReactDOM.render(<Game />, document.getElementById('root'));
+app.run();
