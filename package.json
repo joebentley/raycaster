@@ -18,10 +18,14 @@
     "url": "https://github.com/joebentley/raycaster/issues"
   },
   "homepage": "https://github.com/joebentley/raycaster#readme",
-  "dependencies": {},
+  "dependencies": {
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.40",
     "@babel/preset-env": "^7.0.0-beta.40",
+    "@babel/preset-react": "^7.0.0-beta.40",
     "babel-cli": "^6.26.0",
     "babel-loader": "^8.0.0-beta.0",
     "eslint": "^4.18.0",
