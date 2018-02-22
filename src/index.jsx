@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 
 const app = new App();
 
-app.on('load', function () {
+app.once('load', function () {
   ReactDOM.render(
     <Editor width={app.gridWorld.width} height={app.gridWorld.height} />,
     document.getElementById('root')
