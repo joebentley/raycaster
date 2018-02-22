@@ -1,12 +1,25 @@
 import React from 'react';
+import { copy2DArray } from './utils.js';
 
 function Square(props) { // eslint-disable-line
-  return <button className="square" onClick={props.onClick} />;
+  return <button className="square" onClick={props.onClick}>{props.number}</button>;
 }
 
 export default class Editor extends React.Component {
-  handleClick(i) {
-    console.log(i);
+  constructor (props) {
+    super(props);
+    this.state = {
+      grid: props.initialData
+    };
+  }
+
+  handleClick(x, y) {
+    let newGrid = copy2DArray(this.state.grid);
+    newGrid[y][x] = (newGrid[y][x] + 1) % this.props.numTypesOfSquare;
+    this.props.updateGrid(newGrid);
+    this.setState({
+      grid: newGrid
+    });
   }
 
   render() {
@@ -15,7 +28,10 @@ export default class Editor extends React.Component {
       const squares = [];
       for (let x = 0; x < this.props.width; ++x) {
         const i = y * this.props.width + x;
-        squares[x] = <Square key={i} onClick={() => this.handleClick(i)} />;
+        squares[x] = <Square
+          key={i}
+          onClick={() => this.handleClick(x, y)}
+          number={this.state.grid[y][x]} />;
       }
       rows[y] = <div key={y} className="board-row">{squares}</div>;
     }

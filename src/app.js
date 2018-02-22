@@ -183,7 +183,7 @@ export default class App extends EventEmitter {
     this.rayCaster = new RayCaster(60, 1, 1, this.width);
     this.events = {};
 
-    this.roomData = [
+    const roomData = [
       [1, 1, 1, 1, 1, 1, 2, 1],
       [1, 0, 0, 0, 0, 0, 0, 1],
       [1, 0, 0, 0, 0, 0, 0, 1],
@@ -198,7 +198,7 @@ export default class App extends EventEmitter {
     ];
 
     this.player = new Player({ x: 5, y: 4 }, 0);
-    this.gridWorld = new GridWorld(this.roomData, this.player);
+    this.gridWorld = new GridWorld(roomData, this.player);
 
     this.keys = {};
 
