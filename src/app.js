@@ -1,5 +1,5 @@
 import RayCaster from './raycaster.js';
-import ee from 'event-emitter';
+import EventEmitter from 'events';
 
 class GridWorld {
   constructor(grid, player) {
@@ -172,8 +172,10 @@ class Texture {
   }
 }
 
-export default class App {
+export default class App extends EventEmitter {
   constructor() {
+    super();
+
     this.canvas = document.getElementById('canvas');
     this.ctx = this.canvas.getContext('2d');
     this.width = this.canvas.width;
@@ -261,5 +263,3 @@ export default class App {
     window.requestAnimationFrame(this.loop.bind(this));
   }
 }
-
-ee(App.prototype);
