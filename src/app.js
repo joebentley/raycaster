@@ -1,5 +1,5 @@
 import RayCaster from './raycaster.js';
-
+import ee from 'event-emitter';
 
 class GridWorld {
   constructor(grid, player) {
@@ -181,7 +181,7 @@ export default class App {
     this.rayCaster = new RayCaster(60, 1, 1, this.width);
     this.events = {};
 
-    const roomData = [
+    this.roomData = [
       [1, 1, 1, 1, 1, 1, 2, 1],
       [1, 0, 0, 0, 0, 0, 0, 1],
       [1, 0, 0, 0, 0, 0, 0, 1],
@@ -195,11 +195,8 @@ export default class App {
       [1, 1, 1, 1, 1, 1, 1, 1]
     ];
 
-    this.player = new Player({
-      x: 5,
-      y: 4
-    }, 0);
-    this.gridWorld = new GridWorld(roomData, this.player);
+    this.player = new Player({ x: 5, y: 4 }, 0);
+    this.gridWorld = new GridWorld(this.roomData, this.player);
 
     this.keys = {};
 
@@ -209,16 +206,6 @@ export default class App {
     window.addEventListener('keyup', (e) => {
       this.keys[e.keyCode] = false;
     });
-  }
-
-  on(event, callback) {
-    this.events[event] = callback;
-  }
-
-  emit(event) {
-    if (event in this.events) {
-      this.events[event]();
-    }
   }
 
   run() {
@@ -274,3 +261,5 @@ export default class App {
     window.requestAnimationFrame(this.loop.bind(this));
   }
 }
+
+ee(App.prototype);

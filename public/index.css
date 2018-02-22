@@ -3,6 +3,12 @@ body {
   margin: 20px;
 }
 
+.board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
 .editor {
   margin: 40px;
 }
