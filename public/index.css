@@ -9,6 +9,14 @@ body {
   display: table;
 }
 
+#canvas-container {
+  display: inline-block;
+}
+
+#root {
+  display: inline-block;
+}
+
 .editor {
   margin: 40px;
 }
