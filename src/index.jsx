@@ -4,6 +4,7 @@ import App from './app.js';
 import Editor from './editor.jsx'; // eslint-disable-line
 import { copy2DArray } from './utils.js';
 
+import '../public/index.css';
 
 const app = new App();
 
