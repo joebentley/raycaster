@@ -18,11 +18,30 @@ class GridWorld {
 
   collisionFunc(perspectiveAngle) {
     return (x, y, distance) => {
-      const squareType = this.grid[Math.floor(y)][Math.floor(x)];
-      if (squareType != 0) {
+      const squareType = this.grid[Math.round(y)][Math.round(x)];
+
+      if (squareType !== 0) {
+        // fraction of wall that the ray intersects from 0 to 1, 0 being left 1 being right
+        // how far along the wall the ray hit, so middle of the wall would be 0.5
+        let fractionOfWall;
+        // determine direction of wall
+        if (
+          this.grid[Math.round(y)][Math.round(x-0.1)] == 0 ||
+          this.grid[Math.round(y)][Math.round(x+0.1)] == 0
+        ) { // wall is in x direction
+          fractionOfWall = y - Math.floor(y);
+        }
+        else if (
+          this.grid[Math.round(y-0.1)][Math.round(x)] == 0 ||
+          this.grid[Math.round(y+0.1)][Math.round(x)] == 0
+        ) { // wall is in y direction
+          fractionOfWall = x - Math.floor(x);
+        }
+
         return {
           z: distance * Math.cos(perspectiveAngle),
-          type: squareType
+          type: squareType,
+          fractionOfWall: fractionOfWall
         };
       }
       return null;
@@ -56,17 +75,14 @@ class GridWorld {
             const texture = this.textures[wallType];
             // Perspective transformation of walls
             const texPixel = texture.interpTexPixel(
-              x / width * zArray[columnIndex].z,
+              // get x coord of as how far along the wall the way hit
+              zArray[columnIndex].fractionOfWall,
               (y - (height - wallHeight) / 2) / wallHeight
             );
-            // const texPixel = this.textures[1].getTexPixel(x, y)
+
             data[coord + 0] = texPixel.r;
             data[coord + 1] = texPixel.g;
             data[coord + 2] = texPixel.b;
-
-            // data[coord + 0] = 0
-            // data[coord + 1] = 150 * shadingFactor
-            // data[coord + 2] = 0
           }
           data[coord + 0] *= shadingFactor;
           data[coord + 1] *= shadingFactor;
