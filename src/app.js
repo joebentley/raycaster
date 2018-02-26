@@ -1,5 +1,7 @@
 import RayCaster from './raycaster.js';
 import EventEmitter from 'events';
+import { Entity, EntityManager, Behaviour } from './entity.js';
+import playerUpdate from './behaviours.js';
 
 class GridWorld {
   constructor(grid, player) {
@@ -97,14 +99,6 @@ class GridWorld {
 
   registerTexture(wallIndex, texture) {
     this.textures[wallIndex] = texture;
-  }
-}
-
-
-class Player {
-  constructor(position, facing) {
-    this.position = position;
-    this.facing = facing;
   }
 }
 
@@ -213,8 +207,19 @@ export default class App extends EventEmitter {
       [1, 1, 1, 1, 1, 1, 1, 1]
     ];
 
-    this.player = new Player({ x: 5, y: 4 }, 0);
-    this.gridWorld = new GridWorld(roomData, this.player);
+    this.entityManager = new EntityManager();
+
+    const player = new Entity('player');
+    player.position = { x: 5, y: 4 };
+
+    // TODO move this into behaviours.js
+    const inputController = new Behaviour('controller');
+    inputController.update = playerUpdate.bind(player, this);
+
+    player.addBehaviour(inputController);
+    this.entityManager.addEntity(player);
+
+    this.gridWorld = new GridWorld(roomData, player);
 
     this.keys = {};
 
@@ -242,39 +247,7 @@ export default class App extends EventEmitter {
   }
 
   loop() {
-    if (this.keys[37]) {
-      this.player.facing -= 4;
-    }
-    if (this.keys[39]) {
-      this.player.facing += 4;
-    }
-    if (this.keys[38]) {
-      const newX = this.player.position.x + .1 * Math.cos(Math.PI / 180 * this.player.facing);
-      const newY = this.player.position.y + .1 * Math.sin(Math.PI / 180 * this.player.facing);
-      // Don't let player get too close to wall
-      const collX = this.player.position.x + .4 * Math.cos(Math.PI / 180 * this.player.facing);
-      const collY = this.player.position.y + .4 * Math.sin(Math.PI / 180 * this.player.facing);
-      if (this.gridWorld.collisionFunc(0)(collX, this.player.position.y, 0) === null) {
-        this.player.position.x = newX;
-      }
-      if (this.gridWorld.collisionFunc(0)(this.player.position.x, collY, 0) === null) {
-        this.player.position.y = newY;
-      }
-    }
-    if (this.keys[40]) {
-      const newX = this.player.position.x - .1 * Math.cos(Math.PI / 180 * this.player.facing);
-      const newY = this.player.position.y - .1 * Math.sin(Math.PI / 180 * this.player.facing);
-      // Don't let player get too close to wall
-      const collX = this.player.position.x - .4 * Math.cos(Math.PI / 180 * this.player.facing);
-      const collY = this.player.position.y - .4 * Math.sin(Math.PI / 180 * this.player.facing);
-      if (this.gridWorld.collisionFunc(0)(collX, this.player.position.y, 0) === null) {
-        this.player.position.x = newX;
-      }
-      if (this.gridWorld.collisionFunc(0)(this.player.position.x, collY, 0) === null) {
-        this.player.position.y = newY;
-      }
-    }
-
+    this.entityManager.updateAll();
     this.gridWorld.render(this.width, this.height, this.ctx, this.rayCaster);
     window.requestAnimationFrame(this.loop.bind(this));
   }
