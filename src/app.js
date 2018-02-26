@@ -23,7 +23,7 @@ class GridWorld {
       if (squareType !== 0) {
         // fraction of wall that the ray intersects from 0 to 1, 0 being left 1 being right
         // how far along the wall the ray hit, so middle of the wall would be 0.5
-        let fractionOfWall;
+        let fractionOfWall = 0;
         // determine direction of wall
         if (
           this.grid[Math.round(y)][Math.round(x-0.1)] == 0 ||
