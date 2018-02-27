@@ -1,4 +1,4 @@
-export default function playerUpdate(app) {
+export function playerUpdate(app) {
   if (app.keys[37]) {
     this.facing -= 4;
   }

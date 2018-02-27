@@ -1,7 +1,7 @@
 import RayCaster from './raycaster.js';
 import EventEmitter from 'events';
 import { Entity, EntityManager, Behaviour } from './entity.js';
-import playerUpdate from './behaviours.js';
+import { playerUpdate } from './behaviours.js';
 
 class GridWorld {
   constructor(grid, player) {
