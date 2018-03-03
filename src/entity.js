@@ -1,9 +1,21 @@
 
+/**
+ * Keeps track of unique entity instances by unique `id` properties
+ * 
+ * @export
+ * @class EntityManager
+ */
 export class EntityManager {
   constructor() {
     this.entities = {};
   }
 
+  /**
+   * Register an entity to the EntityManager
+   * 
+   * @param {Entity} entity 
+   * @memberof EntityManager
+   */
   addEntity(entity) {
     if (!entity.hasOwnProperty('id')) {
       throw 'Entity must have id property';
@@ -16,6 +28,13 @@ export class EntityManager {
     return this.entities[id];
   }
 
+  /**
+   * Call `method` on every registered behaviour of every registered entity
+   * provided it has a property named `method`
+   * 
+   * @param {string} method 
+   * @memberof EntityManager
+   */
   apply(method) {
     for (let key in this.entities) {
       this.entities[key].apply(method);
@@ -36,16 +55,17 @@ export class Entity {
     this.id = id;
     this.position = { x: 0, y: 0 };
     this.facing = 0;
-    this.behaviours = {};
+    this.behaviours = [];
   }
 
+  /**
+   * Call `method` on every registered behaviour
+   * 
+   * @param {string} method 
+   * @memberof Entity
+   */
   apply(method) {
-    for (let key in this.behaviours) {
-      const behaviour = this.behaviours[key];
-      if (method in behaviour) {
-        behaviour[method]();
-      }
-    }
+    this.behaviours.map((behaviour) => behaviour.apply(method));
   }
 
   initialize() {
@@ -56,12 +76,14 @@ export class Entity {
     this.apply('update');
   }
 
+  /**
+   * Register a behaviour to this entity
+   * 
+   * @param {Behaviour} behaviour 
+   * @memberof Entity
+   */
   addBehaviour(behaviour) {
-    if (!behaviour.hasOwnProperty('id')) {
-      throw 'Behaviour must have id property';
-    }
-
     behaviour.setParent(this);
-    this.behaviours[behaviour.id] = behaviour;
+    this.behaviours.push(behaviour);
   }
 }

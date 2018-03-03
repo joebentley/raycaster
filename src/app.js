@@ -1,6 +1,6 @@
 import RayCaster from './raycaster.js';
 import EventEmitter from 'events';
-import { Entity, EntityManager, Behaviour } from './entity.js';
+import { Entity, EntityManager } from './entity.js';
 import { InputController } from './behaviours.js';
 import GridWorld from './world.js';
 import { RGBA, SolidColour, Texture } from './texture.js';
@@ -38,6 +38,7 @@ export default class App extends EventEmitter {
     const inputController = new InputController(this);
     player.addBehaviour(inputController);
     this.entityManager.addEntity(player);
+    this.entityManager.initializeAll();
 
     this.gridWorld = new GridWorld(roomData, player);
 

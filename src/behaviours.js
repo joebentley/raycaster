@@ -1,16 +1,38 @@
+/**
+ * Represents a behaviour that can be attached to an entity
+ * Extend this and add methods like `initialize` and `update`
+ * to attach to the relevant engine events
+ * 
+ * @export
+ * @class Behaviour
+ */
 export class Behaviour {
-  constructor(id) {
-    this.id = id;
-  }
-
+  /**
+   * Set parent entity to be accessed via `this.parent`
+   * 
+   * @param {Entity} parent 
+   * @memberof Behaviour
+   */
   setParent(parent) {
     this.parent = parent;
+  }
+
+  /**
+   * Call method with name `method` if it exists on behaviour
+   * 
+   * @param {string} method 
+   * @memberof Behaviour
+   */
+  apply(method) {
+    if (method in this) {
+      this[method]();
+    }
   }
 }
 
 export class InputController extends Behaviour {
   constructor(app) {
-    super('input-controller');
+    super();
 
     if (app) {
       this.setApp(app);
