@@ -42,7 +42,7 @@ export class Entity {
   apply(method) {
     for (let key in this.behaviours) {
       const behaviour = this.behaviours[key];
-      if (behaviour.hasOwnProperty(method)) {
+      if (method in behaviour) {
         behaviour[method]();
       }
     }
@@ -61,12 +61,7 @@ export class Entity {
       throw 'Behaviour must have id property';
     }
 
+    behaviour.setParent(this);
     this.behaviours[behaviour.id] = behaviour;
-  }
-}
-
-export class Behaviour {
-  constructor(id) {
-    this.id = id;
   }
 }
