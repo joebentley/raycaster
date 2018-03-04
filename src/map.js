@@ -14,8 +14,8 @@ export class PointMap {
 
   copy() {
     const map = new PointMap();
-    for (const key in this) {
-      map.map[key] = this[key];
+    for (const key in this.map) {
+      map.map[key] = this.map[key];
     }
     return map;
   }
