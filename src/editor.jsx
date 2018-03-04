@@ -1,5 +1,4 @@
 import React from 'react';
-import { copy2DArray } from './utils.js';
 
 function Square(props) { // eslint-disable-line
   return <button className="square" onClick={props.onClick}>{props.number}</button>;
@@ -14,8 +13,8 @@ export default class Editor extends React.Component {
   }
 
   handleClick(x, y) {
-    let newGrid = copy2DArray(this.state.grid);
-    newGrid[y][x] = (newGrid[y][x] + 1) % this.props.numTypesOfSquare;
+    let newGrid = this.state.grid.copy();
+    newGrid.set(x, y, (newGrid.get(x, y) + 1) % this.props.numTypesOfSquare);
     this.props.updateGrid(newGrid);
     this.setState({
       grid: newGrid
@@ -31,7 +30,7 @@ export default class Editor extends React.Component {
         squares[x] = <Square
           key={i}
           onClick={() => this.handleClick(x, y)}
-          number={this.state.grid[y][x]} />;
+          number={this.state.grid.get(x, y)} />;
       }
       rows[y] = <div key={y} className="board-row">{squares}</div>;
     }

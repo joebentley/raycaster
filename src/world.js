@@ -6,17 +6,9 @@ export default class GridWorld {
     this.textures = {};
   }
 
-  get width() {
-    return this.grid[0].length;
-  }
-
-  get height() {
-    return this.grid.length;
-  }
-
   collisionFunc(perspectiveAngle) {
     return (x, y, distance) => {
-      const squareType = this.grid[Math.round(y)][Math.round(x)];
+      const squareType = this.grid.get(Math.round(x), Math.round(y));
 
       if (squareType !== 0) {
         // fraction of wall that the ray intersects from 0 to 1, 0 being left 1 being right
@@ -24,14 +16,14 @@ export default class GridWorld {
         let fractionOfWall = 0;
         // determine direction of wall
         if (
-          this.grid[Math.round(y)][Math.round(x-0.1)] == 0 ||
-          this.grid[Math.round(y)][Math.round(x+0.1)] == 0
+          this.grid.get(Math.round(x-0.1), Math.round(y)) == 0 ||
+          this.grid.get(Math.round(x+0.1), Math.round(y)) == 0
         ) { // wall is in x direction
           fractionOfWall = y - Math.floor(y);
         }
         else if (
-          this.grid[Math.round(y-0.1)][Math.round(x)] == 0 ||
-          this.grid[Math.round(y+0.1)][Math.round(x)] == 0
+          this.grid.get(Math.round(x), Math.round(y-0.1)) == 0 ||
+          this.grid.get(Math.round(x), Math.round(y+0.1)) == 0
         ) { // wall is in y direction
           fractionOfWall = x - Math.floor(x);
         }

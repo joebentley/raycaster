@@ -4,6 +4,7 @@ import { Entity, EntityManager } from './entity.js';
 import { InputController } from './behaviours.js';
 import GridWorld from './world.js';
 import { RGBA, SolidColour, Texture } from './texture.js';
+import { PointMap } from './map.js';
 
 export default class App extends EventEmitter {
   constructor() {
@@ -40,7 +41,7 @@ export default class App extends EventEmitter {
     this.entityManager.addEntity(player);
     this.entityManager.initializeAll();
 
-    this.gridWorld = new GridWorld(roomData, player);
+    this.gridWorld = new GridWorld(PointMap.fromList(roomData), player);
 
     this.keys = {};
 
