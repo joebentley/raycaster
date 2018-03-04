@@ -5,14 +5,24 @@ class Ray {
     this.maxDist = 500;
   }
 
-  cast(collisionFunc) {
-    for (let distance = 0; distance <= this.maxDist; distance += 0.01) {
+  cast(collisionFunc, initialDistance = 0) {
+    // Cast forwards in large steps and then perform smaller scale distance detection
+    // from further initial distance
+    for (
+      let distance = initialDistance;
+      distance <= this.maxDist;
+      distance += initialDistance > 0 ? 0.01 : 0.05
+    ) {
       const rayX = this.origin.x + distance * Math.cos(Math.PI / 180 * this.angle);
       const rayY = this.origin.y + distance * Math.sin(Math.PI / 180 * this.angle);
 
       let collisionResult = collisionFunc(rayX, rayY, distance);
       if (collisionResult !== null) {
-        return collisionResult;
+        if (initialDistance > 0) {
+          return collisionResult;
+        } else {
+          return this.cast(collisionFunc, distance - 0.05);
+        }
       }
     }
     return null;
