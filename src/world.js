@@ -49,12 +49,13 @@ export default class GridWorld {
       const columnIndex = Math.floor(x / rayCaster.columnWidth);
       const wallHeight = height / zArray[columnIndex].z;
       const shadingFactor = Math.min(1, 1.4 / zArray[columnIndex].z + 0.3);
+      const topOfWall = (height - wallHeight) / 2;
 
       for (let y = 0; y < height; ++y) {
         const coord = y * width * 4 + (x * 4);
         if (
-          y < (height - wallHeight) / 2 ||
-          y > (height + wallHeight) / 2
+          y < topOfWall ||
+          y > topOfWall + wallHeight
         ) {
           data[coord + 0] = 200;
           data[coord + 1] = 200;
@@ -67,7 +68,7 @@ export default class GridWorld {
             const texPixel = texture.interpTexPixel(
               // get x coord of as how far along the wall the way hit
               zArray[columnIndex].fractionOfWall,
-              (y - (height - wallHeight) / 2) / wallHeight
+              (y - topOfWall) / wallHeight
             );
 
             data[coord + 0] = texPixel.r;

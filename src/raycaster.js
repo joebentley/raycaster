@@ -5,7 +5,11 @@ class Ray {
     this.maxDist = 500;
   }
 
-  cast(collisionFunc, initialDistance = 0) {
+  cast(collisionFunc, initialDistance = 0, stackDepth = 0) {
+    if (stackDepth > 3) {
+      return null;
+    }
+
     // Cast forwards in large steps and then perform smaller scale distance detection
     // from further initial distance
     for (
@@ -21,7 +25,7 @@ class Ray {
         if (initialDistance > 0) {
           return collisionResult;
         } else {
-          return this.cast(collisionFunc, distance - 0.05);
+          return this.cast(collisionFunc, distance - 0.05, stackDepth + 1);
         }
       }
     }
